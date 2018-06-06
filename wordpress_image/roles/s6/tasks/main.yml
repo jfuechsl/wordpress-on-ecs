@@ -1,0 +1,11 @@
+---
+- name: Install GNU tar
+  apk:
+    name: tar
+    state: present
+
+- name: Download and unpack the s6 package
+  unarchive:
+    remote_src: yes
+    dest: /
+    src: https://github.com/just-containers/s6-overlay/releases/download/v1.18.1.5/s6-overlay-amd64.tar.gz

@@ -1,0 +1,30 @@
+---
+- name: Install core PHP7 packages
+  apk:
+    name: php7, php7-fpm, php7-opcache
+    state: present
+
+- name: Create www-data group
+  group:
+    name: www-data
+    gid: 1001
+    state: present
+
+- name: Create www-data user
+  user:
+    name: www-data
+    uid: 1001
+    state: present
+    create_home: no
+    group: www-data
+    system: yes
+
+- name: Remove the default php-fpm.conf configuration file
+  file:
+    path: /etc/php7/php-fpm.conf
+    state: absent
+
+- name: Remove the default php-fpm.d configuration directory
+  file:
+    path: /etc/php7/php-fpm.d
+    state: absent

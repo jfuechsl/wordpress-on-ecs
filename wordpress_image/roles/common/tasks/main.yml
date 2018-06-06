@@ -1,0 +1,10 @@
+---
+- name: Upgrade packages and update package cache
+  apk:
+    upgrade: yes
+    update_cache: yes
+
+- name: Install bash
+  apk:
+    name: bash
+    state: present

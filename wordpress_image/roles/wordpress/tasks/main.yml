@@ -1,0 +1,83 @@
+---
+- name: Install MySQL client package
+  apk:
+    name: mysql-client
+    state: present
+
+- name: Install the musl package
+  apk:
+    name: musl
+    state: present
+
+- name: Install required PHP packages
+  apk:
+    name: php7-gd, php7-mysqli, php7-zlib, php7-curl, php7-phar, 
+      php7-json, php7-xml, php7-pdo, php7-openssl, php7-pdo_mysql,
+      php7-session, php7-iconv, php7-mcrypt, php7-ctype, php7-apcu, 
+      php7-intl, php7-bcmath, php7-mbstring, php7-dom, php7-xmlreader, 
+      php7-simplexml
+    state: present
+
+- name: Create the /www directory
+  file:
+    path: /www
+    owner: www-data
+    group: www-data
+    state: directory
+
+- name: Create the /usr/src directory
+  file:
+    path: /usr/src
+    owner: www-data
+    group: www-data
+    recurse: yes
+    state: directory
+
+- name: Download Wordpress
+  get_url:
+    url: "https://wordpress.org/wordpress-{{ wordpress_version }}.tar.gz"
+    dest: /tmp
+    checksum: "sha1:{{ wordpress_archive_sha1 }}"
+
+- name: Install Wordpress
+  unarchive:
+    remote_src: yes
+    src: "/tmp/wordpress-{{ wordpress_version }}.tar.gz"
+    dest: /usr/src
+    owner: www-data
+    group: www-data
+
+- name: Place our wp-config.php file
+  copy:
+    dest: /usr/src/wordpress/
+    src: ./files/wp-config.php
+    owner: www-data
+    group: www-data
+
+- name: Place our Wordpress init script
+  copy:
+    dest: /usr/local/bin/
+    src: ./files/init_wp.sh
+    mode: u+rwx
+
+- name: Place our php configuration files
+  copy:
+    dest: /etc/php7/
+    src: ./files/php/
+    force: yes
+
+- name: Place our nginx configuration files
+  copy:
+    dest: /etc/nginx/
+    src: ./files/nginx/
+    force: yes
+
+- name: Place our s6 configuration files
+  copy:
+    dest: /etc/
+    src: ./files/s6/
+
+- name: Clean Wordpress download
+  file:
+    path: "/tmp/wordpress-{{ wordpress_version }}.tar.gz"
+    state: absent

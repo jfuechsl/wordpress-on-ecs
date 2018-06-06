@@ -1,0 +1,16 @@
+---
+- name: Install the nginx package
+  apk:
+    name: nginx
+    state: present
+
+- name: Install ca-certificates
+  apk:
+    name: ca-certificates
+    state: present
+
+- name: Create a tmp nginx directory
+  file:
+    path: /tmp/nginx
+    recurse: yes
+    state: directory

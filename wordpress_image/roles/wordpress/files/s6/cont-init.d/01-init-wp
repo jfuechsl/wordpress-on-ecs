@@ -1,0 +1,3 @@
+#!/usr/bin/execlineb -P
+
+/usr/local/bin/init_wp.sh
