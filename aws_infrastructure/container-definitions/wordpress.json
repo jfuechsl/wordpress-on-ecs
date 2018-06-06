@@ -1,0 +1,44 @@
+[
+  {
+    "name": "wordpress",
+    "image": "${wordpress_ecr_image_uri}:${wordpress_ecr_image_tag}",
+    "cpu": 512,
+    "memory": 512,
+    "essential": true,
+    "portMappings": [
+      {
+        "containerPort": 80
+      }
+    ],
+    "environment": [
+      { "name": "DB_NAME", "value": "${wp_db_name}" },
+      { "name": "DB_USER", "value": "${wp_db_user}" },
+      { "name": "DB_PASSWORD", "value": "${wp_db_password}" },
+      { "name": "DB_HOST", "value": "${wp_db_host}" },
+      { "name": "DB_CHARSET", "value": "${wp_db_charset}" },
+      { "name": "DB_COLLATE", "value": "${wp_db_collate}" },
+      { "name": "AUTH_KEY", "value": "${wp_auth_key}" },
+      { "name": "SECURE_AUTH_KEY", "value": "${wp_secure_auth_key}" },
+      { "name": "LOGGED_IN_KEY", "value": "${wp_logged_in_key}" },
+      { "name": "NONCE_KEY", "value": "${wp_nonce_key}" },
+      { "name": "AUTH_SALT", "value": "${wp_auth_salt}" },
+      { "name": "SECURE_AUTH_SALT", "value": "${wp_secure_auth_salt}" },
+      { "name": "LOGGED_IN_SALT", "value": "${wp_logged_in_salt}" },
+      { "name": "NONCE_SALT", "value": "${wp_nonce_salt}" },
+      { "name": "WP_TABLE_PREFIX", "value": "${wp_table_prefix}" }
+    ],
+    "mountPoints": [
+      {
+        "sourceVolume": "www-data",
+        "containerPath": "/www"
+      }
+    ],
+    "logConfiguration": {
+      "logDriver": "awslogs",
+      "options": {
+        "awslogs-group": "wordpress-logs",
+        "awslogs-region": "${aws_region}"
+      }
+    }
+  }
+]
