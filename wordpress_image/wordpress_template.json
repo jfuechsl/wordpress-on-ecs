@@ -1,0 +1,68 @@
+{
+  "variables": {
+    "ansible_connection": "docker",
+    "ansible_host": "builder-{{timestamp}}",
+    "wordpress_docker_repo": "jfuechsl/wordpress",
+    "wordpress_docker_tag": "latest",
+    "aws_profile": "",
+    "ecr_registry_url": ""
+  },
+  "builders": [
+    {
+      "type": "docker",
+      "image": "alpine:3.7",
+      "commit": true,
+      "run_command": [
+        "-d", "-i", "-t",
+        "--name", "{{user `ansible_host`}}",
+        "{{.Image}}",
+        "/bin/ash"
+      ],
+      "changes": [
+        "VOLUME /www",
+        "EXPOSE 80",
+        "ENTRYPOINT /init",
+        "CMD []"
+      ]
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "inline": [
+        "apk add --no-cache --virtual .ansible-deps build-base python shadow"
+      ]
+    },
+    {
+      "type": "ansible",
+      "user": "root",
+      "playbook_file": "./wordpress_playbook.yml",
+      "extra_arguments": [
+        "--extra-vars",
+        "ansible_host={{user `ansible_host`}} ansible_connection={{user `ansible_connection`}}"
+      ]
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "apk del .ansible-deps",
+        "rm -rf /root/.ansible"
+      ]
+    }
+  ],
+  "post-processors": [
+    [
+      {
+        "type": "docker-tag",
+        "repository": "{{user `ecr_registry_url`}}/{{user `wordpress_docker_repo`}}",
+        "tag": "{{user `wordpress_docker_tag`}}"
+      },
+      {
+        "type": "docker-push",
+        "login_server": "{{user `ecr_registry_url`}}",
+        "ecr_login": true,
+        "aws_profile": "{{user `aws_profile`}}"
+      }
+    ]
+  ]
+}

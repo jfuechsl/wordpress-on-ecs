@@ -1,0 +1,6 @@
+---
+- name: Install and configure Wordpress in a Docker container (Alpine based)
+  hosts: all
+  roles:
+    - s6
+    - wordpress
